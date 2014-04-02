@@ -1,49 +1,122 @@
 package com.thedeanda.util.process;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 //TODO: move this to a utils folder
 public class RunExec {
+	private static final Logger log = LoggerFactory.getLogger(RunExec.class);
+
+	public static ProcessResult exec(String command, File directory)
+			throws IOException {
+		return exec(command, directory, 0);
+	}
+
+	public static ProcessResult exec(String command, File directory,
+			int maxDuration) throws IOException {
+		String[] parts = StringUtils.split(command);
+		List<String> list = Arrays.asList(parts);
+		return exec(list, directory, maxDuration);
+	}
 
 	public static ProcessResult exec(List<String> command, File directory)
 			throws IOException {
-		StringBuilder ret = new StringBuilder();
+		return exec(command, directory, 0);
+	}
+
+	/**
+	 * 
+	 * @param command
+	 * @param directory
+	 * @param maxDuration
+	 *            - maximum amount of time in ms to let the command run before
+	 *            aborting it
+	 * @return
+	 * @throws IOException
+	 */
+	public static ProcessResult exec(List<String> command, File directory,
+			int maxDuration) throws IOException {
+
 		ProcessBuilder pb = new ProcessBuilder(command);
-		pb.redirectErrorStream(true);
+		RunnableStreamReader stdOut = null;
+		RunnableStreamReader errOut = null;
+
+		// pb.redirectErrorStream(true);
 		if (directory != null)
 			pb.directory(directory);
 
-		Process process = pb.start();
-
-		// Read out dir output
-		InputStream is = process.getInputStream();
-		InputStreamReader isr = new InputStreamReader(is);
-		BufferedReader br = new BufferedReader(isr);
-		String line;
-		while ((line = br.readLine()) != null) {
-			ret.append(line);
-			ret.append("\n");
-		}
+		final Process process = pb.start();
 
 		// Wait to get exit value
-		int exitValue;
+		final IntegerHolder exitValue = new IntegerHolder();
 		long duration = 0;
+		Thread stdT = null;
+		Thread errT = null;
+		Thread waitT = null;
 		try {
 			long start = System.currentTimeMillis();
-			exitValue = process.waitFor();
+			// make sure all threads start before timing for stop
+			CountDownLatch startLatch = new CountDownLatch(2);
+			final CountDownLatch endLatch = new CountDownLatch(2);
+
+			stdOut = new RunnableStreamReader(process.getInputStream(), startLatch, endLatch);
+			errOut = new RunnableStreamReader(process.getErrorStream(), startLatch, endLatch);
+			stdT = new Thread(stdOut);
+			errT = new Thread(stdOut);
+			stdT.start();
+			errT.start();
+
+			startLatch.await();
+			if (maxDuration <= 0) {
+				exitValue.value = process.waitFor();
+			} else {
+				final CountDownLatch doneSignal = new CountDownLatch(1);
+				waitT = new Thread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							endLatch.await();
+							exitValue.value = process.waitFor();
+						} catch (InterruptedException e) {
+							log.warn(e.getMessage(), e);
+						}
+						doneSignal.countDown();
+					}
+				});
+				waitT.start();
+				// wait for thread to finish...
+				if (!doneSignal.await(maxDuration, TimeUnit.MILLISECONDS)) {
+					// stop process
+					log.warn("process took too long, aborting");
+					process.destroy();
+					waitT.interrupt();
+					exitValue.value = -1;
+				}
+			}
 			long end = System.currentTimeMillis();
 			duration = end - start;
 		} catch (InterruptedException e) {
-			exitValue = -1;
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			exitValue.value = -1;
+			log.error(e.getMessage(), e);
+		} finally {
+			if (stdT != null)
+				stdT.interrupt();
+			if (errT != null)
+				errT.interrupt();
+			if (waitT != null)
+				waitT.interrupt();
 		}
 
-		return new ProcessResult(ret.toString(), exitValue, duration);
+		return new ProcessResult(stdOut.getOutput(), errOut.getOutput(),
+				exitValue.value, duration);
 	}
+
 }
