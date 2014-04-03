@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,9 +46,12 @@ public class RunExec {
 	public static ProcessResult exec(List<String> command, File directory,
 			int maxDuration) throws IOException {
 
+		File stdOutFile = File.createTempFile("runexec_", ".std");
+		File errOutFile = File.createTempFile("runexec_", ".err");
+
 		ProcessBuilder pb = new ProcessBuilder(command);
-		RunnableStreamReader stdOut = null;
-		RunnableStreamReader errOut = null;
+		pb.redirectError(errOutFile);
+		pb.redirectOutput(stdOutFile);
 
 		// pb.redirectErrorStream(true);
 		if (directory != null)
@@ -61,20 +65,12 @@ public class RunExec {
 		Thread stdT = null;
 		Thread errT = null;
 		Thread waitT = null;
+		String stdOut = null;
+		String errOut = null;
 		try {
 			long start = System.currentTimeMillis();
 			// make sure all threads start before timing for stop
-			CountDownLatch startLatch = new CountDownLatch(2);
-			final CountDownLatch endLatch = new CountDownLatch(2);
 
-			stdOut = new RunnableStreamReader(process.getInputStream(), startLatch, endLatch);
-			errOut = new RunnableStreamReader(process.getErrorStream(), startLatch, endLatch);
-			stdT = new Thread(stdOut);
-			errT = new Thread(stdOut);
-			stdT.start();
-			errT.start();
-
-			startLatch.await();
 			if (maxDuration <= 0) {
 				exitValue.value = process.waitFor();
 			} else {
@@ -83,7 +79,6 @@ public class RunExec {
 					@Override
 					public void run() {
 						try {
-							endLatch.await();
 							exitValue.value = process.waitFor();
 						} catch (InterruptedException e) {
 							log.warn(e.getMessage(), e);
@@ -103,6 +98,10 @@ public class RunExec {
 			}
 			long end = System.currentTimeMillis();
 			duration = end - start;
+
+			stdOut = FileUtils.readFileToString(stdOutFile);
+			errOut = FileUtils.readFileToString(errOutFile);
+
 		} catch (InterruptedException e) {
 			exitValue.value = -1;
 			log.error(e.getMessage(), e);
@@ -113,10 +112,11 @@ public class RunExec {
 				errT.interrupt();
 			if (waitT != null)
 				waitT.interrupt();
+			stdOutFile.delete();
+			errOutFile.delete();
 		}
 
-		return new ProcessResult(stdOut.getOutput(), errOut.getOutput(),
-				exitValue.value, duration);
+		return new ProcessResult(stdOut, errOut, exitValue.value, duration);
 	}
 
 }
