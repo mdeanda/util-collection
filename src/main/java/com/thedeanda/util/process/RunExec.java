@@ -44,30 +44,30 @@ public class RunExec {
 	 * @throws IOException
 	 */
 	public static ProcessResult exec(List<String> command, File directory,
-			int maxDuration) throws IOException {
+			long maxDuration) throws IOException {
 
-		File stdOutFile = File.createTempFile("runexec_", ".std");
-		File errOutFile = File.createTempFile("runexec_", ".err");
-
-		ProcessBuilder pb = new ProcessBuilder(command);
-		pb.redirectError(errOutFile);
-		pb.redirectOutput(stdOutFile);
-
-		// pb.redirectErrorStream(true);
-		if (directory != null)
-			pb.directory(directory);
-
-		final Process process = pb.start();
+		File stdOutFile = null;
+		File errOutFile = null;
 
 		// Wait to get exit value
 		final IntegerHolder exitValue = new IntegerHolder();
 		long duration = 0;
-		Thread stdT = null;
-		Thread errT = null;
 		Thread waitT = null;
 		String stdOut = null;
 		String errOut = null;
 		try {
+			stdOutFile = File.createTempFile("runexec_", ".std");
+			errOutFile = File.createTempFile("runexec_", ".err");
+
+			ProcessBuilder pb = new ProcessBuilder(command);
+			pb.redirectError(errOutFile);
+			pb.redirectOutput(stdOutFile);
+
+			// pb.redirectErrorStream(true);
+			if (directory != null)
+				pb.directory(directory);
+
+			final Process process = pb.start();
 			long start = System.currentTimeMillis();
 			// make sure all threads start before timing for stop
 
@@ -106,14 +106,12 @@ public class RunExec {
 			exitValue.value = -1;
 			log.error(e.getMessage(), e);
 		} finally {
-			if (stdT != null)
-				stdT.interrupt();
-			if (errT != null)
-				errT.interrupt();
 			if (waitT != null)
 				waitT.interrupt();
-			stdOutFile.delete();
-			errOutFile.delete();
+			if (stdOutFile != null)
+				stdOutFile.delete();
+			if (errOutFile != null)
+				errOutFile.delete();
 		}
 
 		return new ProcessResult(stdOut, errOut, exitValue.value, duration);
