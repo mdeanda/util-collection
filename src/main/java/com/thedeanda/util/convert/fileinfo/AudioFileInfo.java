@@ -1,10 +1,9 @@
 package com.thedeanda.util.convert.fileinfo;
 
-
 public class AudioFileInfo extends FileInfo {
 	private static final long serialVersionUID = 1L;
 	private AudioEncoding encoding;
-	private int lengthInMillis;
+	private int lengthInHundredths;
 
 	public AudioEncoding getEncoding() {
 		return encoding;
@@ -14,11 +13,12 @@ public class AudioFileInfo extends FileInfo {
 		this.encoding = encoding;
 	}
 
-	public int getLengthInMillis() {
-		return lengthInMillis;
+	public int getLengthInHundredths() {
+		return lengthInHundredths;
 	}
 
-	public void setLengthInMillis(int lengthInMillis) {
-		this.lengthInMillis = lengthInMillis;
+	public void setLengthInHundredths(int lengthInHundredths) {
+		this.lengthInHundredths = lengthInHundredths;
 	}
+
 }
