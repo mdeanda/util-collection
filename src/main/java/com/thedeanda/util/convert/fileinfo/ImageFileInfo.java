@@ -1,6 +1,6 @@
 package com.thedeanda.util.convert.fileinfo;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class ImageFileInfo extends FileInfo {
 	private static final long serialVersionUID = 1L;
