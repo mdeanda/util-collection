@@ -7,7 +7,6 @@ version = '1.0-SNAPSHOT'
 
 description = """servlettools"""
 
-
 repositories {
 	maven { url "http://repo.thedeanda.com/artifactory/libs-release" }
 	maven { url "http://repo.thedeanda.com/artifactory/libs-snapshot" }
