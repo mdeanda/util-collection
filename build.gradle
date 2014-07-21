@@ -5,7 +5,7 @@ apply plugin: 'eclipse'
 group = 'com.thedeanda'
 version = '1.0-SNAPSHOT'
 
-description = """servlettools"""
+description = """util-collection"""
 
 repositories {
 	mavenCentral()
