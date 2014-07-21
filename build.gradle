@@ -8,8 +8,7 @@ version = '1.0-SNAPSHOT'
 description = """servlettools"""
 
 repositories {
-	maven { url "http://repo.thedeanda.com/artifactory/libs-release" }
-	maven { url "http://repo.thedeanda.com/artifactory/libs-snapshot" }
+	mavenCentral()
 }
 dependencies {
 	compile group: 'org.slf4j', name: 'slf4j-log4j12', version:'1.6.4'
