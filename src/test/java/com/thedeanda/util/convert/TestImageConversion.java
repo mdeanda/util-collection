@@ -147,4 +147,59 @@ public class TestImageConversion {
 		assertEquals(400, fi2.getWidth());
 		assertEquals(322, fi2.getHeight());
 	}
+
+	@Test
+	public void testPngHeight() throws InterruptedException {
+		final CountDownLatch latch = new CountDownLatch(1);
+		final FileInfoHolder holder = new FileInfoHolder();
+
+		File file = new File("src/test/resources/mini_r8_car.png");
+		fc.readFileInfo(file, new FileInfoListener() {
+			@Override
+			public void fileInfoReady(FileInfo fileInfo) {
+				holder.fileInfo = fileInfo;
+				latch.countDown();
+			}
+		});
+
+		if (!latch.await(10, TimeUnit.SECONDS)) {
+			fail("file info never ready");
+		}
+
+		FileInfo fileInfo = holder.fileInfo;
+		assertNotNull(fileInfo);
+		assertTrue(fileInfo instanceof ImageFileInfo);
+
+		ImageFileInfo fi = (ImageFileInfo) fileInfo;
+		assertEquals(400, fi.getWidth());
+		assertEquals(322, fi.getHeight());
+
+		// ok seems ok, lets scale image
+		final CountDownLatch latch2 = new CountDownLatch(1);
+		ImageScaleParams params = new ImageScaleParams(0, 40);
+		fc.convertResize(fi, params, new ConversionListener() {
+			@Override
+			public void failed() {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void complete(List<FileInfo> files) {
+				TestImageConversion.this.files.addAll(files);
+				latch2.countDown();
+			}
+		});
+		if (!latch2.await(10, TimeUnit.SECONDS)) {
+			fail("conversion failed or took too long");
+		}
+
+		assertNotNull(files);
+		assertEquals("file count is off", 1, files.size());
+		ImageFileInfo fi2 = (ImageFileInfo) files.get(0);
+		assertTrue("file exists", fi.getFile().exists());
+		assertEquals(50, fi2.getWidth());
+		assertEquals(40, fi2.getHeight());
+	}
+
 }

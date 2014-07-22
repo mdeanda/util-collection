@@ -1,8 +1,15 @@
 package com.thedeanda.util.convert.image;
 
-public class ImageScaleParams {
+import java.io.Serializable;
+
+public class ImageScaleParams implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private int width;
 	private int height;
+
+	public ImageScaleParams() {
+		this(0, 0);
+	}
 
 	public ImageScaleParams(int width) {
 		this(width, 0);
@@ -19,5 +26,13 @@ public class ImageScaleParams {
 
 	public int getHeight() {
 		return height;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
 	}
 }
