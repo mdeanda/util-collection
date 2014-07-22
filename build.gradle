@@ -7,6 +7,9 @@ version = '1.0-SNAPSHOT'
 
 description = """util-collection"""
 
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
 repositories {
 	mavenCentral()
 }
