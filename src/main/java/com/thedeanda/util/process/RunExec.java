@@ -114,6 +114,11 @@ public class RunExec {
 				errOutFile.delete();
 		}
 
+		if (exitValue.value != 0) {
+			log.warn("non-zero exit value: {} {}", exitValue.value, errOut);
+			log.warn(StringUtils.join(command, " "));
+		}
+
 		return new ProcessResult(stdOut, errOut, exitValue.value, duration);
 	}
 

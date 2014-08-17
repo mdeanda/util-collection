@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.Serializable;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 abstract public class FileInfo implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -24,5 +26,10 @@ abstract public class FileInfo implements Serializable {
 		}
 
 		return ext;
+	}
+
+	public String toString() {
+		ToStringBuilder builder = new ReflectionToStringBuilder(this);
+		return builder.build();
 	}
 }
