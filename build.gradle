@@ -32,6 +32,9 @@ dependencies {
 jar {
 	manifest.attributes provider: 'gradle'
 }
+configurations {
+	published
+}
 artifactory {
 	contextUrl = "${artifactory_contextUrl}"
 	publish {
@@ -59,5 +62,14 @@ artifactory {
 			maven = true
 		}
 	}
-
+}
+task javadocJar(type: Jar, dependsOn: javadoc) {
+	classifier = 'javadoc'
+	from javadoc.destinationDir
+}
+artifactoryPublish {
+	dependsOn javadocJar
+}
+artifacts {
+	published javadocJar
 }
