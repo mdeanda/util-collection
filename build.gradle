@@ -10,6 +10,7 @@ buildscript {
 		}
 	}
 }
+
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'eclipse'
@@ -17,24 +18,15 @@ apply plugin: 'jacoco'
 apply plugin: 'com.jfrog.artifactory-upload'
 
 group = 'com.thedeanda'
-version = '1.0.1-SNAPSHOT'
+version = '1.0'
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
-dependencies {
-	compile group: 'org.slf4j', name: 'slf4j-api', version:'1.+'
-	compile group: 'org.apache.commons', name: 'commons-lang3', version:'3.3.2'
-	compile group: 'commons-io', name: 'commons-io', version:'2.4'
-	testCompile group: 'junit', name: 'junit', version:'4.11'
-}
-
 jar {
 	manifest.attributes provider: 'gradle'
 }
-configurations {
-	published
-}
+
 artifactory {
 	contextUrl = "${artifactory_contextUrl}"
 	publish {
@@ -62,14 +54,12 @@ artifactory {
 			maven = true
 		}
 	}
+
 }
-task javadocJar(type: Jar, dependsOn: javadoc) {
-	classifier = 'javadoc'
-	from javadoc.destinationDir
-}
-artifactoryPublish {
-	dependsOn javadocJar
-}
-artifacts {
-	published javadocJar
+
+dependencies {
+	compile group: 'org.slf4j', name: 'slf4j-api', version:'1.+'
+	compile group: 'org.apache.commons', name: 'commons-lang3', version:'3.3.2'
+	compile group: 'commons-io', name: 'commons-io', version:'2.4'
+	testCompile group: 'junit', name: 'junit', version:'4.11'
 }
