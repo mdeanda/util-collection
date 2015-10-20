@@ -12,6 +12,8 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.thedeanda.util.convert.fileinfo.AudioEncoding;
+import com.thedeanda.util.convert.fileinfo.AudioFileInfo;
 import com.thedeanda.util.convert.fileinfo.FileInfo;
 import com.thedeanda.util.convert.fileinfo.FileInfoListener;
 import com.thedeanda.util.convert.fileinfo.ImageFileInfo;
@@ -45,7 +47,8 @@ public class TestFileInfo {
 
 		FileInfo fileInfo = holder.fileInfo;
 		assertNotNull(fileInfo);
-		
+		assertEquals(file, fileInfo.getFile());
+
 		TextFileInfo fi = (TextFileInfo) fileInfo;
 		// TODO: finish
 	}
@@ -71,6 +74,7 @@ public class TestFileInfo {
 		FileInfo fileInfo = holder.fileInfo;
 		assertNotNull(fileInfo);
 		assertTrue(fileInfo instanceof ImageFileInfo);
+		assertEquals(file, fileInfo.getFile());
 
 		ImageFileInfo fi = (ImageFileInfo) fileInfo;
 		assertEquals(400, fi.getWidth());
@@ -100,6 +104,7 @@ public class TestFileInfo {
 		FileInfo fileInfo = holder.fileInfo;
 		assertNotNull(fileInfo);
 		assertTrue(fileInfo instanceof ImageFileInfo);
+		assertEquals(file, fileInfo.getFile());
 
 		ImageFileInfo fi = (ImageFileInfo) fileInfo;
 		assertEquals(600, fi.getWidth());
@@ -130,6 +135,7 @@ public class TestFileInfo {
 		FileInfo fileInfo = holder.fileInfo;
 		assertNotNull(fileInfo);
 		assertTrue(fileInfo instanceof ImageFileInfo);
+		assertEquals(file, fileInfo.getFile());
 
 		ImageFileInfo fi = (ImageFileInfo) fileInfo;
 		assertEquals(506, fi.getWidth());
@@ -138,4 +144,59 @@ public class TestFileInfo {
 		assertEquals("gif", fi.getExtension());
 	}
 
+	@Test
+	public void testMp3() throws InterruptedException {
+		final CountDownLatch latch = new CountDownLatch(1);
+		final FileInfoHolder holder = new FileInfoHolder();
+
+		File file = new File("src/test/resources/06-Radiohead-FaustArp.mp3");
+		fc.readFileInfo(file, new FileInfoListener() {
+			@Override
+			public void fileInfoReady(FileInfo fileInfo) {
+				holder.fileInfo = fileInfo;
+				latch.countDown();
+			}
+		});
+
+		if (!latch.await(10, TimeUnit.SECONDS)) {
+			fail("file info never ready");
+		}
+
+		FileInfo fileInfo = holder.fileInfo;
+		assertNotNull(fileInfo);
+		assertTrue(fileInfo instanceof AudioFileInfo);
+		assertEquals(file, fileInfo.getFile());
+
+		AudioFileInfo fi = (AudioFileInfo) fileInfo;
+		assertEquals("mp3", fi.getExtension());
+		assertEquals(AudioEncoding.MP3, fi.getEncoding());
+	}
+
+	@Test
+	public void testOggVorbis() throws InterruptedException {
+		final CountDownLatch latch = new CountDownLatch(1);
+		final FileInfoHolder holder = new FileInfoHolder();
+
+		File file = new File("src/test/resources/Beck-DeadWildCat.ogg");
+		fc.readFileInfo(file, new FileInfoListener() {
+			@Override
+			public void fileInfoReady(FileInfo fileInfo) {
+				holder.fileInfo = fileInfo;
+				latch.countDown();
+			}
+		});
+
+		if (!latch.await(10, TimeUnit.SECONDS)) {
+			fail("file info never ready");
+		}
+
+		FileInfo fileInfo = holder.fileInfo;
+		assertNotNull(fileInfo);
+		assertTrue(fileInfo instanceof AudioFileInfo);
+		assertEquals(file, fileInfo.getFile());
+
+		AudioFileInfo fi = (AudioFileInfo) fileInfo;
+		assertEquals("ogg", fi.getExtension());
+		assertEquals(AudioEncoding.VORBIS, fi.getEncoding());
+	}
 }

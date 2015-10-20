@@ -29,7 +29,8 @@ public class FileInfoReader implements Runnable {
 	private static final Pattern sizePatternFromIdentifyCmd = Pattern
 			.compile("^.*\\s+(\\d+)x(\\d+)\\+.*$");
 
-	public FileInfoReader(FileConverter fileConverter, File file, FileInfoListener listener) {
+	public FileInfoReader(FileConverter fileConverter, File file,
+			FileInfoListener listener) {
 		log.trace("new file info reader");
 		this.fileConverter = fileConverter;
 		this.file = file;
@@ -65,7 +66,7 @@ public class FileInfoReader implements Runnable {
 	}
 
 	private FileInfo fileId(String line) throws IOException {
-		log.debug("fileId from: {}", line);
+		log.debug("fileId from line: {}", line);
 
 		if (StringUtils.isBlank(line))
 			return null;
@@ -85,6 +86,10 @@ public class FileInfoReader implements Runnable {
 			return readImageFileInfo(line);
 		} else if (line.contains("PNG")) {
 			return readImageFileInfo(line);
+		} else if (StringUtils.containsIgnoreCase(line, "audio")) {
+			return readAudioFileInfo(line);
+		} else {
+			log.debug("unknown file");
 		}
 
 		return null;
@@ -93,6 +98,21 @@ public class FileInfoReader implements Runnable {
 	private FileInfo readTextFileInfo(String line) {
 		TextFileInfo ret = new TextFileInfo();
 		ret.setFile(file);
+		return ret;
+	}
+
+	private AudioFileInfo readAudioFileInfo(String line) throws IOException {
+		AudioFileInfo ret = new AudioFileInfo();
+		ret.setFile(file);
+		AudioEncoding encoding = AudioEncoding.OTHER;
+
+		if (StringUtils.containsIgnoreCase(line, "vorbis"))
+			encoding = AudioEncoding.VORBIS;
+		else if (StringUtils.containsIgnoreCase(line, "id3"))
+			encoding = AudioEncoding.MP3;
+
+		ret.setEncoding(encoding);
+
 		return ret;
 	}
 
