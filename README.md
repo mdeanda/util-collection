@@ -1,4 +1,4 @@
 util-collection
 ===============
 
-utility library related to java collections (lists, queues, etc)
+utility library with random things like file conversion (shelled out to image magick, ffmpeg, etc) and loading properties files.
