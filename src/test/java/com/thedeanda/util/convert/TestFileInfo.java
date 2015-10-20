@@ -15,6 +15,7 @@ import org.junit.Test;
 import com.thedeanda.util.convert.fileinfo.FileInfo;
 import com.thedeanda.util.convert.fileinfo.FileInfoListener;
 import com.thedeanda.util.convert.fileinfo.ImageFileInfo;
+import com.thedeanda.util.convert.fileinfo.TextFileInfo;
 
 public class TestFileInfo {
 	private FileConverter fc;
@@ -44,6 +45,8 @@ public class TestFileInfo {
 
 		FileInfo fileInfo = holder.fileInfo;
 		assertNotNull(fileInfo);
+		
+		TextFileInfo fi = (TextFileInfo) fileInfo;
 		// TODO: finish
 	}
 
@@ -72,6 +75,8 @@ public class TestFileInfo {
 		ImageFileInfo fi = (ImageFileInfo) fileInfo;
 		assertEquals(400, fi.getWidth());
 		assertEquals(322, fi.getHeight());
+		assertEquals("png", fi.getThumbExtension());
+		assertEquals("png", fi.getExtension());
 	}
 
 	@Test
@@ -99,6 +104,8 @@ public class TestFileInfo {
 		ImageFileInfo fi = (ImageFileInfo) fileInfo;
 		assertEquals(600, fi.getWidth());
 		assertEquals(703, fi.getHeight());
+		assertEquals("jpg", fi.getThumbExtension());
+		assertEquals("jpg", fi.getExtension());
 	}
 
 	@Test
@@ -127,6 +134,8 @@ public class TestFileInfo {
 		ImageFileInfo fi = (ImageFileInfo) fileInfo;
 		assertEquals(506, fi.getWidth());
 		assertEquals(900, fi.getHeight());
+		assertEquals("gif", fi.getThumbExtension());
+		assertEquals("gif", fi.getExtension());
 	}
 
 }

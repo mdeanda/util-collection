@@ -1,4 +1,4 @@
-package com.thedeanda.util.domain;
+package com.thedeanda.util.convert;
 
 import java.io.Serializable;
 

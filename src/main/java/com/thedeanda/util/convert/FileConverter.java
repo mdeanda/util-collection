@@ -12,7 +12,6 @@ import com.thedeanda.util.convert.fileinfo.FileInfoReader;
 import com.thedeanda.util.convert.fileinfo.ImageFileInfo;
 import com.thedeanda.util.convert.image.ImageScaleParams;
 import com.thedeanda.util.convert.image.ImageScaler;
-import com.thedeanda.util.domain.Pointer;
 
 public class FileConverter {
 	private String file = "/usr/bin/file";
@@ -23,12 +22,16 @@ public class FileConverter {
 	private ExecutorService executor;
 
 	public FileConverter() {
-		this.executor = Executors.newFixedThreadPool(Runtime.getRuntime()
-				.availableProcessors(), new ThreadFactory() {
-			public Thread newThread(Runnable r) {
-				return new Thread(r, "FileConverterThread");
-			}
-		});
+		this(Runtime.getRuntime().availableProcessors());
+	}
+
+	public FileConverter(int threads) {
+		this.executor = Executors.newFixedThreadPool(threads,
+				new ThreadFactory() {
+					public Thread newThread(Runnable r) {
+						return new Thread(r, "FileConverterThread");
+					}
+				});
 	}
 
 	public String getFfmpeg() {

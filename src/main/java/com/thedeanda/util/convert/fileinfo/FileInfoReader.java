@@ -29,9 +29,9 @@ public class FileInfoReader implements Runnable {
 	private static final Pattern sizePatternFromIdentifyCmd = Pattern
 			.compile("^.*\\s+(\\d+)x(\\d+)\\+.*$");
 
-	public FileInfoReader(FileConverter fc, File file, FileInfoListener listener) {
+	public FileInfoReader(FileConverter fileConverter, File file, FileInfoListener listener) {
 		log.trace("new file info reader");
-		this.fileConverter = fc;
+		this.fileConverter = fileConverter;
 		this.file = file;
 		this.listener = listener;
 	}
@@ -65,7 +65,7 @@ public class FileInfoReader implements Runnable {
 	}
 
 	private FileInfo fileId(String line) throws IOException {
-		log.debug(line);
+		log.debug("fileId from: {}", line);
 
 		if (StringUtils.isBlank(line))
 			return null;
@@ -75,9 +75,9 @@ public class FileInfoReader implements Runnable {
 			return null;
 		line = line.substring(colon + 1).trim();
 
-		if ("ASCII text".equals(line)) {
+		if ("ASCII text".equalsIgnoreCase(line)) {
 			return readTextFileInfo(line);
-		} else if ("UTF-8 Unicode text".equals(line)) {
+		} else if ("UTF-8 Unicode text".equalsIgnoreCase(line)) {
 			return readTextFileInfo(line);
 		} else if (line.contains("JPEG")) {
 			return readImageFileInfo(line);
