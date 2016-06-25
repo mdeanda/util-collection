@@ -11,57 +11,66 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PropertyUtils {
-	private static final Logger log = LoggerFactory
-			.getLogger(PropertyUtils.class);
+	private static final Logger log = LoggerFactory.getLogger(PropertyUtils.class);
 
 	/**
-	 * reads properties from local resource but overrides if /etc/{filename}
-	 * exits.
+	 * reads properties from local resource but overrides when others existing
+	 * such that:
+	 * <ul>
+	 * <li>/etc/${name}.properties</li>
+	 * <li>/etc/${name}/${name}.properties</li>
+	 * <li>${user.home}/${name}.properties
+	 * </ul>
 	 * 
-	 * @param filename
-	 *            without path separators before or embedded: foo.properties
+	 * @param name
+	 *            name of properties file without path or extension: "example"
 	 * @return
 	 */
-	public static Properties readProperties(String filename) {
-		Properties defaults = new Properties();
+	public static Properties readProperties(String name) {
+		Properties properties = new Properties();
 		boolean loaded = false;
-		loaded = loadAndMerge(defaults,
-				PropertyUtils.class.getResourceAsStream("/" + filename));
+		String filename = name + ".properties";
+		loaded = loadAndMerge(properties, PropertyUtils.class.getResourceAsStream("/" + filename));
 		if (loaded) {
-			log.debug("properties file loaded: classpath:/" + filename);
+			log.debug("Properties file loaded: classpath:/" + filename);
 		} else {
-			log.warn("properties file not loaded: classpath:/" + filename);
+			log.warn("Properties file not loaded: classpath:/" + filename);
 		}
 
-		String[] paths = { "/etc/" + filename,
-				System.getProperty("user.home") + File.separator + filename,
-				filename };
+		String[] paths = { "/etc/" + filename, "/etc/" + name + File.separator + filename,
+				System.getProperty("user.home") + File.separator + filename, filename };
 
 		for (String path : paths) {
 			File overrides = new File(path);
-			if (overrides.exists()) {
-				log.debug("loading overrides file: {}", overrides);
-				FileInputStream fis = null;
-				try {
-					fis = new FileInputStream(overrides);
-					loadAndMerge(defaults, fis);
-				} catch (IOException e) {
-					log.warn(e.getMessage(), e);
-				} finally {
-					if (fis != null) {
-						try {
-							fis.close();
-						} catch (IOException e) {
-							log.warn(e.getMessage(), e);
-						}
-					}
-				}
-			} else {
-				log.warn("file not found: {}, skipping", overrides);
-			}
+			loadAndMerge(properties, overrides);
 		}
 
-		return defaults;
+		log.info("Loaded properties: {}", properties);
+		return properties;
+	}
+
+	private static void loadAndMerge(Properties properties, File file) {
+		if (file.exists()) {
+			log.debug("Loading overrides file: {}", file);
+			FileInputStream fis = null;
+			try {
+				fis = new FileInputStream(file);
+				loadAndMerge(properties, fis);
+			} catch (IOException e) {
+				log.warn(e.getMessage(), e);
+			} finally {
+				if (fis != null) {
+					try {
+						fis.close();
+					} catch (IOException e) {
+						log.warn(e.getMessage(), e);
+					}
+				}
+			}
+		} else {
+			log.debug("File not found: {}, skipping", file);
+		}
+
 	}
 
 	private static boolean loadAndMerge(Properties props, InputStream is) {
