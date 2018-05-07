@@ -1,7 +1,8 @@
 buildscript {
 	repositories {
 		maven {
-			url "http://repo.jfrog.org/artifactory/gradle"
+			// url "http://repo.jfrog.org/artifactory/gradle"
+			 url "${artifactory_plugins}"
 		}
 		jcenter()
 		mavenLocal()
