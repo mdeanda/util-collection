@@ -16,20 +16,17 @@ import org.slf4j.LoggerFactory;
 public class RunExec {
 	private static final Logger log = LoggerFactory.getLogger(RunExec.class);
 
-	public static ProcessResult exec(String command, File directory)
-			throws IOException {
+	public static ProcessResult exec(String command, File directory) throws IOException {
 		return exec(command, directory, 0);
 	}
 
-	public static ProcessResult exec(String command, File directory,
-			int maxDuration) throws IOException {
+	public static ProcessResult exec(String command, File directory, int maxDuration) throws IOException {
 		String[] parts = StringUtils.split(command);
 		List<String> list = Arrays.asList(parts);
 		return exec(list, directory, maxDuration);
 	}
 
-	public static ProcessResult exec(List<String> command, File directory)
-			throws IOException {
+	public static ProcessResult exec(List<String> command, File directory) throws IOException {
 		return exec(command, directory, 0);
 	}
 
@@ -43,8 +40,7 @@ public class RunExec {
 	 * @return
 	 * @throws IOException
 	 */
-	public static ProcessResult exec(List<String> command, File directory,
-			long maxDuration) throws IOException {
+	public static ProcessResult exec(List<String> command, File directory, long maxDuration) throws IOException {
 
 		File stdOutFile = null;
 		File errOutFile = null;
@@ -56,6 +52,7 @@ public class RunExec {
 		String stdOut = null;
 		String errOut = null;
 		try {
+			// TODO: allow passing in a temp file directory
 			stdOutFile = File.createTempFile("runexec_", ".std");
 			errOutFile = File.createTempFile("runexec_", ".err");
 

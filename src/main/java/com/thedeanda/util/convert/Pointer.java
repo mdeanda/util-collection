@@ -2,7 +2,7 @@ package com.thedeanda.util.convert;
 
 import java.io.Serializable;
 
-public class Pointer<T> implements Serializable {
+class Pointer<T> implements Serializable {
 	private static final long serialVersionUID = 1L;
 	public T value;
 
