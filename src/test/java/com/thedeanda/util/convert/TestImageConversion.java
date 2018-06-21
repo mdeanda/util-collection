@@ -68,7 +68,7 @@ public class TestImageConversion {
 		// ok seems ok, lets scale image
 		final CountDownLatch latch2 = new CountDownLatch(1);
 		ImageScaleParams params = new ImageScaleParams(200);
-		fc.convertResize(fi, params, new ConversionListener() {
+		fc.convertResize(fi, params, new ConversionListener<ImageFileInfo>() {
 			@Override
 			public void failed() {
 				// TODO Auto-generated method stub
@@ -76,7 +76,7 @@ public class TestImageConversion {
 			}
 
 			@Override
-			public void complete(List<FileInfo> files) {
+			public void complete(List<ImageFileInfo> files) {
 				TestImageConversion.this.files.addAll(files);
 				latch2.countDown();
 			}
@@ -122,7 +122,7 @@ public class TestImageConversion {
 		// ok seems ok, lets scale image
 		final CountDownLatch latch2 = new CountDownLatch(1);
 		ImageScaleParams params = new ImageScaleParams(800);
-		fc.convertResize(fi, params, new ConversionListener() {
+		fc.convertResize(fi, params, new ConversionListener<ImageFileInfo>() {
 			@Override
 			public void failed() {
 				// TODO Auto-generated method stub
@@ -130,7 +130,7 @@ public class TestImageConversion {
 			}
 
 			@Override
-			public void complete(List<FileInfo> files) {
+			public void complete(List<ImageFileInfo> files) {
 				TestImageConversion.this.files.addAll(files);
 				latch2.countDown();
 			}
@@ -177,7 +177,7 @@ public class TestImageConversion {
 		// ok seems ok, lets scale image
 		final CountDownLatch latch2 = new CountDownLatch(1);
 		ImageScaleParams params = new ImageScaleParams(0, 40);
-		fc.convertResize(fi, params, new ConversionListener() {
+		fc.convertResize(fi, params, new ConversionListener<ImageFileInfo>() {
 			@Override
 			public void failed() {
 				// TODO Auto-generated method stub
@@ -185,7 +185,7 @@ public class TestImageConversion {
 			}
 
 			@Override
-			public void complete(List<FileInfo> files) {
+			public void complete(List<ImageFileInfo> files) {
 				TestImageConversion.this.files.addAll(files);
 				latch2.countDown();
 			}
