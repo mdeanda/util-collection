@@ -26,8 +26,6 @@ public class AudioConvertor implements Runnable {
 	private ConversionListener<AudioFileInfo> listener;
 	private FileConverter fileConverter;
 
-	private static final String TEMP_BASENAME = "util-collection";
-
 	private AudioFileInfo fileInfo = null;
 
 	public AudioConvertor(FileConverter fileConverter, AudioFileInfo file, AudioProperties properties,
@@ -42,15 +40,16 @@ public class AudioConvertor implements Runnable {
 	public void run() {
 		File file = this.file.getFile();
 		File directory = file.getParentFile();
-		String fname = properties.getTargetBaseFilename() + "." + properties.getCodec().getExt();
 
 		File outputFile = null;
 		boolean failed = true;
 		try {
-			outputFile = File.createTempFile(TEMP_BASENAME, fname);
+			outputFile = File.createTempFile(properties.getTargetBaseFilename(), "." + properties.getCodec().getExt(),
+					fileConverter.getTempDir());
 
 			List<String> command = new ArrayList<String>();
 			command.add(fileConverter.getFfmpeg());
+			command.add("-y");
 			command.add("-i");
 			command.add(file.getName());
 
@@ -61,13 +60,14 @@ public class AudioConvertor implements Runnable {
 
 			command.add(outputFile.getAbsolutePath());
 
-			ProcessResult pr = RunExec.exec(command, directory);
+			RunExec runExec = fileConverter.getRunExec();
+			ProcessResult pr = runExec.exec(command, directory);
 			if (pr.getResult() != 0 || !outputFile.exists() || outputFile.length() <= 0) {
 				log.debug("result from audio convrsion: " + pr.getResult());
 				failed = true;
 			}
 			failed = false;
-		} catch (IOException e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			failed = true;
 		}
@@ -102,7 +102,7 @@ public class AudioConvertor implements Runnable {
 	private void addParamCodec(List<String> command, AudioProperties properties) {
 		AudioCodec val = properties.getCodec();
 		command.add("-c:a");
-		switch(val) {
+		switch (val) {
 		case MP3:
 			command.add("libmp3lame");
 			break;

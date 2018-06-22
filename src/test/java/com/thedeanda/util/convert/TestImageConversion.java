@@ -27,6 +27,7 @@ public class TestImageConversion {
 	@Before
 	public void setup() {
 		fc = new FileConverter();
+		fc.setTempDir(new File("tmp"));
 		files = new ArrayList<FileInfo>();
 	}
 

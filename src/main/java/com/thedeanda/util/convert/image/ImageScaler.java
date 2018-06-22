@@ -65,7 +65,7 @@ public class ImageScaler implements Runnable {
 		File outputFile = null;
 		boolean failed = true;
 		try {
-			outputFile = File.createTempFile(TEMP_BASENAME, fname);
+			outputFile = File.createTempFile(TEMP_BASENAME, fname, fileConverter.getTempDir());
 
 			List<String> command = new ArrayList<String>();
 			command.add(fileConverter.getConvert());
@@ -78,7 +78,8 @@ public class ImageScaler implements Runnable {
 			command.add(sizeString);
 			command.add(outputFile.getAbsolutePath());
 
-			ProcessResult pr = RunExec.exec(command, directory);
+			RunExec runExec = fileConverter.getRunExec();
+			ProcessResult pr = runExec.exec(command, directory);
 			if (pr.getResult() != 0 || !outputFile.exists()
 					|| outputFile.length() <= 0) {
 				log.warn("result from file resize: " + pr.getResult());

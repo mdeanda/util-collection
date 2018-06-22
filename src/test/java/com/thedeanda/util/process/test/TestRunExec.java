@@ -23,7 +23,7 @@ public class TestRunExec {
 	public void testBasic() throws Exception {
 		List<String> command = Arrays.asList("ls");
 		File directory = new File("src");
-		ProcessResult results = RunExec.exec(command, directory);
+		ProcessResult results = new RunExec().exec(command, directory);
 
 		assertEquals("exit code", 0, results.getResult());
 		assertEquals("main\ntest\n", results.getStdOutput());
@@ -33,7 +33,7 @@ public class TestRunExec {
 	public void testBasicWithMax() throws Exception {
 		List<String> command = Arrays.asList("ls");
 		File directory = new File("src");
-		ProcessResult results = RunExec.exec(command, directory, 10000);
+		ProcessResult results = new RunExec().exec(command, directory, 10000);
 
 		assertEquals("exit code", 0, results.getResult());
 		assertEquals("main\ntest\n", results.getStdOutput());
@@ -42,7 +42,7 @@ public class TestRunExec {
 	@Test
 	public void testBasicAsString() throws Exception {
 		File directory = new File("src");
-		ProcessResult results = RunExec.exec("ls", directory);
+		ProcessResult results = new RunExec().exec("ls", directory);
 
 		assertEquals("exit code", 0, results.getResult());
 		assertEquals("main\ntest\n", results.getStdOutput());
@@ -52,7 +52,7 @@ public class TestRunExec {
 	public void testSleep() throws Exception {
 		List<String> command = Arrays.asList("sleep", "4");
 		File directory = new File("src");
-		ProcessResult results = RunExec.exec(command, directory);
+		ProcessResult results = new RunExec().exec(command, directory);
 
 		assertEquals("exit code", 0, results.getResult());
 		assertEquals("", results.getStdOutput());
@@ -61,7 +61,7 @@ public class TestRunExec {
 	@Test
 	public void testSleepInterrupted() throws Exception {
 		File directory = new File("src");
-		ProcessResult results = RunExec.exec("sleep 4", directory, 1000);
+		ProcessResult results = new RunExec().exec("sleep 4", directory, 1000);
 
 		assertEquals("exit code", -1, results.getResult());
 		assertEquals("", results.getStdOutput());

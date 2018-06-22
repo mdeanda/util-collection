@@ -12,21 +12,22 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//TODO: move this to a utils folder
 public class RunExec {
 	private static final Logger log = LoggerFactory.getLogger(RunExec.class);
+	
+	private File tempDir = null;
 
-	public static ProcessResult exec(String command, File directory) throws IOException {
+	public ProcessResult exec(String command, File directory) throws IOException {
 		return exec(command, directory, 0);
 	}
 
-	public static ProcessResult exec(String command, File directory, int maxDuration) throws IOException {
+	public ProcessResult exec(String command, File directory, int maxDuration) throws IOException {
 		String[] parts = StringUtils.split(command);
 		List<String> list = Arrays.asList(parts);
 		return exec(list, directory, maxDuration);
 	}
 
-	public static ProcessResult exec(List<String> command, File directory) throws IOException {
+	public ProcessResult exec(List<String> command, File directory) throws IOException {
 		return exec(command, directory, 0);
 	}
 
@@ -40,7 +41,7 @@ public class RunExec {
 	 * @return
 	 * @throws IOException
 	 */
-	public static ProcessResult exec(List<String> command, File directory, long maxDuration) throws IOException {
+	public ProcessResult exec(List<String> command, File directory, long maxDuration) throws IOException {
 
 		File stdOutFile = null;
 		File errOutFile = null;
@@ -53,8 +54,8 @@ public class RunExec {
 		String errOut = null;
 		try {
 			// TODO: allow passing in a temp file directory
-			stdOutFile = File.createTempFile("runexec_", ".std");
-			errOutFile = File.createTempFile("runexec_", ".err");
+			stdOutFile = File.createTempFile("runexec_", ".std", tempDir);
+			errOutFile = File.createTempFile("runexec_", ".err", tempDir);
 
 			ProcessBuilder pb = new ProcessBuilder(command);
 			pb.redirectError(errOutFile);
@@ -117,6 +118,14 @@ public class RunExec {
 		}
 
 		return new ProcessResult(stdOut, errOut, exitValue.value, duration);
+	}
+
+	public File getTempDir() {
+		return tempDir;
+	}
+
+	public void setTempDir(File tempDir) {
+		this.tempDir = tempDir;
 	}
 
 }

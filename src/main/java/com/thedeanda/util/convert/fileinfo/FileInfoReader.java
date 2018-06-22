@@ -56,7 +56,8 @@ public class FileInfoReader implements Runnable {
 		command.add(fileConverter.getFile());
 		command.add(file.getName());
 
-		ProcessResult result = RunExec.exec(command, file.getParentFile(),
+		RunExec runExec = fileConverter.getRunExec();
+		ProcessResult result = runExec.exec(command, file.getParentFile(),
 				MAX_DURATION);
 		if (result != null && !StringUtils.isBlank(result.getStdOutput())) {
 			return result.getStdOutput().trim();
@@ -159,7 +160,8 @@ public class FileInfoReader implements Runnable {
 		command.add(fileConverter.getIdentify());
 		command.add(file.getName());
 
-		ProcessResult result = RunExec.exec(command, file.getParentFile(),
+		RunExec runExec = fileConverter.getRunExec();
+		ProcessResult result = runExec.exec(command, file.getParentFile(),
 				MAX_DURATION);
 		if (result != null && !StringUtils.isBlank(result.getStdOutput())) {
 			return result.getStdOutput().trim();

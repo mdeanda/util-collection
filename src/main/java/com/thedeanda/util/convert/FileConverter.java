@@ -6,6 +6,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.thedeanda.util.convert.audio.AudioConvertor;
 import com.thedeanda.util.convert.audio.AudioProperties;
 import com.thedeanda.util.convert.fileinfo.AudioFileInfo;
@@ -15,12 +17,14 @@ import com.thedeanda.util.convert.fileinfo.FileInfoReader;
 import com.thedeanda.util.convert.fileinfo.ImageFileInfo;
 import com.thedeanda.util.convert.image.ImageScaleParams;
 import com.thedeanda.util.convert.image.ImageScaler;
+import com.thedeanda.util.process.RunExec;
 
 public class FileConverter {
 	private String file = "/usr/bin/file";
 	private String ffmpeg = "/usr/bin/ffmpeg";
 	private String identify = "/usr/bin/identify";
 	private String convert = "/usr/bin/convert";
+	private File tempDir = null;
 
 	private ExecutorService executor;
 
@@ -34,6 +38,16 @@ public class FileConverter {
 				return new Thread(r, "FileConverterThread");
 			}
 		});
+	}
+
+	public RunExec getRunExec() {
+		RunExec runExec = new RunExec();
+		if (tempDir != null) {
+			tempDir.mkdirs();
+			runExec.setTempDir(tempDir);
+		}
+
+		return runExec;
 	}
 
 	public String getFfmpeg() {
@@ -112,4 +126,13 @@ public class FileConverter {
 		is.run();
 		return ret.value;
 	}
+
+	public File getTempDir() {
+		return tempDir;
+	}
+
+	public void setTempDir(File tempDir) {
+		this.tempDir = tempDir;
+	}
+
 }

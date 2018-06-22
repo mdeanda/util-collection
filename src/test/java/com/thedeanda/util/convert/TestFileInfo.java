@@ -25,6 +25,7 @@ public class TestFileInfo {
 	@Before
 	public void setup() {
 		fc = new FileConverter();
+		fc.setTempDir(new File("tmp"));
 	}
 
 	@Test
