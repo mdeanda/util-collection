@@ -1,6 +1,7 @@
 package com.thedeanda.util.process.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.Arrays;
@@ -63,7 +64,7 @@ public class TestRunExec {
 		File directory = new File("src");
 		ProcessResult results = new RunExec().exec("sleep 4", directory, 1000);
 
-		assertEquals("exit code", -1, results.getResult());
+		assertTrue("exit code", 0 != results.getResult());
 		assertEquals("", results.getStdOutput());
 	}
 
