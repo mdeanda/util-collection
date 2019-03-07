@@ -6,3 +6,6 @@
 /bin/
 /build/
 /gradle-app.setting
+/.idea/
+*.iml
+/tmp/
