@@ -1,9 +1,11 @@
 package com.thedeanda.util.convert;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import com.thedeanda.util.convert.fileinfo.FileInfo;
+import com.thedeanda.util.convert.fileinfo.ImageFileInfo;
+import com.thedeanda.util.convert.image.ImageScaleParams;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -13,14 +15,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import com.thedeanda.util.convert.fileinfo.FileInfo;
-import com.thedeanda.util.convert.fileinfo.FileInfoListener;
-import com.thedeanda.util.convert.fileinfo.ImageFileInfo;
-import com.thedeanda.util.convert.image.ImageScaleParams;
+import static org.junit.Assert.*;
 
 public class TestImageConversion {
 	private FileConverter fc;
@@ -45,12 +40,11 @@ public class TestImageConversion {
 	@Test
 	public void testPng() throws InterruptedException, TimeoutException, ExecutionException {
 		final CountDownLatch latch = new CountDownLatch(1);
-		final FileInfoHolder holder = new FileInfoHolder();
+		FileInfo fileInfo = null;
 
 		File file = new File("src/test/resources/mini_r8_car.png");
-		holder.fileInfo = fc.readFileInfo(file).get(10, TimeUnit.SECONDS);
+		fileInfo = fc.readFileInfo(file).get(10, TimeUnit.SECONDS);
 
-		FileInfo fileInfo = holder.fileInfo;
 		assertNotNull(fileInfo);
 		assertTrue(fileInfo instanceof ImageFileInfo);
 
@@ -88,13 +82,11 @@ public class TestImageConversion {
 
 	@Test
 	public void testPngUpscale() throws InterruptedException, TimeoutException, ExecutionException {
-		final CountDownLatch latch = new CountDownLatch(1);
-		final FileInfoHolder holder = new FileInfoHolder();
+		FileInfo fileInfo = null;
 
 		File file = new File("src/test/resources/mini_r8_car.png");
-		holder.fileInfo = fc.readFileInfo(file).get(10, TimeUnit.SECONDS);
+		fileInfo = fc.readFileInfo(file).get(10, TimeUnit.SECONDS);
 
-		FileInfo fileInfo = holder.fileInfo;
 		assertNotNull(fileInfo);
 		assertTrue(fileInfo instanceof ImageFileInfo);
 
@@ -133,13 +125,11 @@ public class TestImageConversion {
 
 	@Test
 	public void testPngHeight() throws InterruptedException, TimeoutException, ExecutionException {
-		final CountDownLatch latch = new CountDownLatch(1);
-		final FileInfoHolder holder = new FileInfoHolder();
+		FileInfo fileInfo = null;
 
 		File file = new File("src/test/resources/mini_r8_car.png");
-		holder.fileInfo = fc.readFileInfo(file).get(10, TimeUnit.SECONDS);
+		fileInfo = fc.readFileInfo(file).get(10, TimeUnit.SECONDS);
 
-		FileInfo fileInfo = holder.fileInfo;
 		assertNotNull(fileInfo);
 		assertTrue(fileInfo instanceof ImageFileInfo);
 

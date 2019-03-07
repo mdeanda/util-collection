@@ -1,19 +1,21 @@
 package com.thedeanda.util.convert;
 
-import java.io.File;
-import java.util.List;
-import java.util.concurrent.*;
-
 import com.thedeanda.util.convert.audio.AudioConvertor;
 import com.thedeanda.util.convert.audio.AudioProperties;
 import com.thedeanda.util.convert.fileinfo.AudioFileInfo;
 import com.thedeanda.util.convert.fileinfo.FileInfo;
-import com.thedeanda.util.convert.fileinfo.FileInfoListener;
 import com.thedeanda.util.convert.fileinfo.FileInfoReader;
 import com.thedeanda.util.convert.fileinfo.ImageFileInfo;
 import com.thedeanda.util.convert.image.ImageScaleParams;
 import com.thedeanda.util.convert.image.ImageScaler;
 import com.thedeanda.util.process.RunExec;
+
+import java.io.File;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
 
 public class FileConverter {
 	private String file = "/usr/bin/file";

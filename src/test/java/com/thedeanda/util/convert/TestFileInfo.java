@@ -1,9 +1,8 @@
 package com.thedeanda.util.convert;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import com.thedeanda.util.convert.fileinfo.*;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.File;
 import java.util.concurrent.CountDownLatch;
@@ -11,15 +10,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import com.thedeanda.util.convert.fileinfo.AudioEncoding;
-import com.thedeanda.util.convert.fileinfo.AudioFileInfo;
-import com.thedeanda.util.convert.fileinfo.FileInfo;
-import com.thedeanda.util.convert.fileinfo.FileInfoListener;
-import com.thedeanda.util.convert.fileinfo.ImageFileInfo;
-import com.thedeanda.util.convert.fileinfo.TextFileInfo;
+import static org.junit.Assert.*;
 
 public class TestFileInfo {
 	private FileConverter fc;
@@ -32,13 +23,11 @@ public class TestFileInfo {
 
 	@Test
 	public void testPlainText() throws InterruptedException, TimeoutException, ExecutionException {
-		final CountDownLatch latch = new CountDownLatch(1);
-		final FileInfoHolder holder = new FileInfoHolder();
+		FileInfo fileInfo = null;
 
 		File file = new File("src/test/resources/lorem.txt");
-		holder.fileInfo = fc.readFileInfo(file).get(10, TimeUnit.SECONDS);
+		fileInfo = fc.readFileInfo(file).get(10, TimeUnit.SECONDS);
 
-		FileInfo fileInfo = holder.fileInfo;
 		assertNotNull(fileInfo);
 		assertEquals(file, fileInfo.getFile());
 
@@ -48,13 +37,11 @@ public class TestFileInfo {
 
 	@Test
 	public void testPng() throws InterruptedException, TimeoutException, ExecutionException {
-		final CountDownLatch latch = new CountDownLatch(1);
-		final FileInfoHolder holder = new FileInfoHolder();
+		FileInfo fileInfo = null;
 
 		File file = new File("src/test/resources/mini_r8_car.png");
-		holder.fileInfo = fc.readFileInfo(file).get(10, TimeUnit.SECONDS);
+		fileInfo = fc.readFileInfo(file).get(10, TimeUnit.SECONDS);
 
-		FileInfo fileInfo = holder.fileInfo;
 		assertNotNull(fileInfo);
 		assertTrue(fileInfo instanceof ImageFileInfo);
 		assertEquals(file, fileInfo.getFile());
@@ -68,13 +55,11 @@ public class TestFileInfo {
 
 	@Test
 	public void testJpg() throws InterruptedException, TimeoutException, ExecutionException {
-		final CountDownLatch latch = new CountDownLatch(1);
-		final FileInfoHolder holder = new FileInfoHolder();
+		FileInfo fileInfo = null;
 
 		File file = new File("src/test/resources/Baby-taco.jpg");
-		holder.fileInfo = fc.readFileInfo(file).get(10, TimeUnit.SECONDS);
+		fileInfo = fc.readFileInfo(file).get(10, TimeUnit.SECONDS);
 
-		FileInfo fileInfo = holder.fileInfo;
 		assertNotNull(fileInfo);
 		assertTrue(fileInfo instanceof ImageFileInfo);
 		assertEquals(file, fileInfo.getFile());
@@ -88,14 +73,12 @@ public class TestFileInfo {
 
 	@Test
 	public void testGif() throws InterruptedException, TimeoutException, ExecutionException {
-		final CountDownLatch latch = new CountDownLatch(1);
-		final FileInfoHolder holder = new FileInfoHolder();
+		FileInfo fileInfo = null;
 
 		File file = new File(
 				"src/test/resources/0fd479da894756522251fc29f1af2bd1.gif");
-		holder.fileInfo = fc.readFileInfo(file).get(10, TimeUnit.SECONDS);
+		fileInfo = fc.readFileInfo(file).get(10, TimeUnit.SECONDS);
 
-		FileInfo fileInfo = holder.fileInfo;
 		assertNotNull(fileInfo);
 		assertTrue(fileInfo instanceof ImageFileInfo);
 		assertEquals(file, fileInfo.getFile());
@@ -109,13 +92,11 @@ public class TestFileInfo {
 
 	@Test
 	public void testMp3() throws InterruptedException, TimeoutException, ExecutionException {
-		final CountDownLatch latch = new CountDownLatch(1);
-		final FileInfoHolder holder = new FileInfoHolder();
+		FileInfo fileInfo = null;
 
 		File file = new File("src/test/resources/06-Radiohead-FaustArp.mp3");
-		holder.fileInfo = fc.readFileInfo(file).get(10, TimeUnit.SECONDS);
+		fileInfo = fc.readFileInfo(file).get(10, TimeUnit.SECONDS);
 
-		FileInfo fileInfo = holder.fileInfo;
 		assertNotNull(fileInfo);
 		assertTrue(fileInfo instanceof AudioFileInfo);
 		assertEquals(file, fileInfo.getFile());
@@ -127,13 +108,11 @@ public class TestFileInfo {
 
 	@Test
 	public void testOggVorbis() throws InterruptedException, TimeoutException, ExecutionException {
-		final CountDownLatch latch = new CountDownLatch(1);
-		final FileInfoHolder holder = new FileInfoHolder();
+		FileInfo fileInfo = null;
 
 		File file = new File("src/test/resources/Beck-DeadWildCat.ogg");
-		holder.fileInfo = fc.readFileInfo(file).get(10, TimeUnit.SECONDS);
+		fileInfo = fc.readFileInfo(file).get(10, TimeUnit.SECONDS);
 
-		FileInfo fileInfo = holder.fileInfo;
 		assertNotNull(fileInfo);
 		assertTrue(fileInfo instanceof AudioFileInfo);
 		assertEquals(file, fileInfo.getFile());

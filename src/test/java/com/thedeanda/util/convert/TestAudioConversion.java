@@ -1,9 +1,13 @@
 package com.thedeanda.util.convert;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import com.thedeanda.util.convert.audio.AudioCodec;
+import com.thedeanda.util.convert.audio.AudioProperties;
+import com.thedeanda.util.convert.fileinfo.AudioEncoding;
+import com.thedeanda.util.convert.fileinfo.AudioFileInfo;
+import com.thedeanda.util.convert.fileinfo.FileInfo;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -13,16 +17,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import com.thedeanda.util.convert.audio.AudioCodec;
-import com.thedeanda.util.convert.audio.AudioProperties;
-import com.thedeanda.util.convert.fileinfo.AudioEncoding;
-import com.thedeanda.util.convert.fileinfo.AudioFileInfo;
-import com.thedeanda.util.convert.fileinfo.FileInfo;
-import com.thedeanda.util.convert.fileinfo.FileInfoListener;
+import static org.junit.Assert.*;
 
 public class TestAudioConversion {
 
@@ -45,22 +40,21 @@ public class TestAudioConversion {
 
 	@Test
 	public void testMp3ToOgg() throws InterruptedException, ExecutionException, TimeoutException {
-		final CountDownLatch latch = new CountDownLatch(1);
-		final FileInfoHolder holder = new FileInfoHolder();
+		FileInfo fileInfo = null;
 
 		File file = new File("src/test/resources/06-Radiohead-FaustArp.mp3");
-		holder.fileInfo = convertor.readFileInfo(file).get(10, TimeUnit.SECONDS);
+		fileInfo = convertor.readFileInfo(file).get(10, TimeUnit.SECONDS);
 
-		AudioFileInfo fileInfo = (AudioFileInfo) holder.fileInfo;
-		assertNotNull(fileInfo);
-		assertTrue(fileInfo instanceof AudioFileInfo);
+		AudioFileInfo audioFileInfo = (AudioFileInfo) fileInfo;
+		assertNotNull(audioFileInfo);
+		assertTrue(audioFileInfo instanceof AudioFileInfo);
 
 		final CountDownLatch latch2 = new CountDownLatch(1);
 		AudioProperties properties = new AudioProperties();
 		properties.setCodec(AudioCodec.Vorbis);
 		properties.setTargetBaseFilename("radiohead");
 		final List<AudioFileInfo> generatedFiles = new ArrayList<>();
-		convertor.convertAudio(fileInfo, properties, new ConversionListener<AudioFileInfo>() {
+		convertor.convertAudio(audioFileInfo, properties, new ConversionListener<AudioFileInfo>() {
 			@Override
 			public void failed() {
 				latch2.countDown();
@@ -91,22 +85,21 @@ public class TestAudioConversion {
 
 	@Test
 	public void testOggToMp3() throws InterruptedException, TimeoutException, ExecutionException {
-		final CountDownLatch latch = new CountDownLatch(1);
-		final FileInfoHolder holder = new FileInfoHolder();
+		FileInfo fileInfo = null;
 
 		File file = new File("src/test/resources/Beck-DeadWildCat.ogg");
-		holder.fileInfo = convertor.readFileInfo(file).get(10, TimeUnit.SECONDS);
+		fileInfo = convertor.readFileInfo(file).get(10, TimeUnit.SECONDS);
 
-		AudioFileInfo fileInfo = (AudioFileInfo) holder.fileInfo;
-		assertNotNull(fileInfo);
-		assertTrue(fileInfo instanceof AudioFileInfo);
+		AudioFileInfo audioFileInfo = (AudioFileInfo) fileInfo;
+		assertNotNull(audioFileInfo);
+		assertTrue(audioFileInfo instanceof AudioFileInfo);
 
 		final CountDownLatch latch2 = new CountDownLatch(1);
 		AudioProperties properties = new AudioProperties();
 		properties.setCodec(AudioCodec.MP3);
 		properties.setTargetBaseFilename("beck");
 		final List<AudioFileInfo> generatedFiles = new ArrayList<>();
-		convertor.convertAudio(fileInfo, properties, new ConversionListener<AudioFileInfo>() {
+		convertor.convertAudio(audioFileInfo, properties, new ConversionListener<AudioFileInfo>() {
 			@Override
 			public void failed() {
 				latch2.countDown();
