@@ -2,11 +2,7 @@ package com.thedeanda.util.convert;
 
 import java.io.File;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-
-import org.apache.commons.lang3.StringUtils;
+import java.util.concurrent.*;
 
 import com.thedeanda.util.convert.audio.AudioConvertor;
 import com.thedeanda.util.convert.audio.AudioProperties;
@@ -82,22 +78,8 @@ public class FileConverter {
 		this.convert = convert;
 	}
 
-	public void readFileInfo(File file, FileInfoListener listener) {
-		executor.execute(new FileInfoReader(this, file, listener));
-	}
-
-	public FileInfo readFileInfoInProcess(File file) {
-		final Pointer<FileInfo> ret = new Pointer<FileInfo>();
-		FileInfoReader fir = new FileInfoReader(this, file, new FileInfoListener() {
-
-			@Override
-			public void fileInfoReady(FileInfo fileInfo) {
-				ret.value = fileInfo;
-			}
-		});
-		fir.run();
-
-		return ret.value;
+	public Future<FileInfo> readFileInfo(File file) {
+		return executor.submit(new FileInfoReader(this, file));
 	}
 
 	public void convertAudio(AudioFileInfo file, AudioProperties properties,

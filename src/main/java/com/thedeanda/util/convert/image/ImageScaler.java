@@ -93,14 +93,9 @@ public class ImageScaler implements Runnable {
 
 		if (!failed) {
 			// now lets read file info...
-			FileInfoReader r = new FileInfoReader(this.fileConverter,
-					outputFile, new FileInfoListener() {
-						@Override
-						public void fileInfoReady(FileInfo fi) {
-							fileInfo = (ImageFileInfo) fi;
-						}
-					});
-			r.run();
+			//TODO: verify that we always get an ImageFileInfo instance here
+			FileInfoReader r = new FileInfoReader(this.fileConverter, outputFile);
+			fileInfo = (ImageFileInfo) r.call();
 
 			if (fileInfo == null) {
 				failed = true;

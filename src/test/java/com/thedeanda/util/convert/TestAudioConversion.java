@@ -9,7 +9,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.junit.After;
 import org.junit.Before;
@@ -42,22 +44,12 @@ public class TestAudioConversion {
 	}
 
 	@Test
-	public void testMp3ToOgg() throws InterruptedException {
+	public void testMp3ToOgg() throws InterruptedException, ExecutionException, TimeoutException {
 		final CountDownLatch latch = new CountDownLatch(1);
 		final FileInfoHolder holder = new FileInfoHolder();
 
 		File file = new File("src/test/resources/06-Radiohead-FaustArp.mp3");
-		convertor.readFileInfo(file, new FileInfoListener() {
-			@Override
-			public void fileInfoReady(FileInfo fileInfo) {
-				holder.fileInfo = fileInfo;
-				latch.countDown();
-			}
-		});
-
-		if (!latch.await(10, TimeUnit.SECONDS)) {
-			fail("file info never ready");
-		}
+		holder.fileInfo = convertor.readFileInfo(file).get(10, TimeUnit.SECONDS);
 
 		AudioFileInfo fileInfo = (AudioFileInfo) holder.fileInfo;
 		assertNotNull(fileInfo);
@@ -98,22 +90,12 @@ public class TestAudioConversion {
 	
 
 	@Test
-	public void testOggToMp3() throws InterruptedException {
+	public void testOggToMp3() throws InterruptedException, TimeoutException, ExecutionException {
 		final CountDownLatch latch = new CountDownLatch(1);
 		final FileInfoHolder holder = new FileInfoHolder();
 
 		File file = new File("src/test/resources/Beck-DeadWildCat.ogg");
-		convertor.readFileInfo(file, new FileInfoListener() {
-			@Override
-			public void fileInfoReady(FileInfo fileInfo) {
-				holder.fileInfo = fileInfo;
-				latch.countDown();
-			}
-		});
-
-		if (!latch.await(10, TimeUnit.SECONDS)) {
-			fail("file info never ready");
-		}
+		holder.fileInfo = convertor.readFileInfo(file).get(10, TimeUnit.SECONDS);
 
 		AudioFileInfo fileInfo = (AudioFileInfo) holder.fileInfo;
 		assertNotNull(fileInfo);

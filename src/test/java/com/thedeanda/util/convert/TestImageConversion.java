@@ -9,7 +9,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.junit.After;
 import org.junit.Before;
@@ -41,22 +43,12 @@ public class TestImageConversion {
 	}
 
 	@Test
-	public void testPng() throws InterruptedException {
+	public void testPng() throws InterruptedException, TimeoutException, ExecutionException {
 		final CountDownLatch latch = new CountDownLatch(1);
 		final FileInfoHolder holder = new FileInfoHolder();
 
 		File file = new File("src/test/resources/mini_r8_car.png");
-		fc.readFileInfo(file, new FileInfoListener() {
-			@Override
-			public void fileInfoReady(FileInfo fileInfo) {
-				holder.fileInfo = fileInfo;
-				latch.countDown();
-			}
-		});
-
-		if (!latch.await(10, TimeUnit.SECONDS)) {
-			fail("file info never ready");
-		}
+		holder.fileInfo = fc.readFileInfo(file).get(10, TimeUnit.SECONDS);
 
 		FileInfo fileInfo = holder.fileInfo;
 		assertNotNull(fileInfo);
@@ -95,22 +87,12 @@ public class TestImageConversion {
 	}
 
 	@Test
-	public void testPngUpscale() throws InterruptedException {
+	public void testPngUpscale() throws InterruptedException, TimeoutException, ExecutionException {
 		final CountDownLatch latch = new CountDownLatch(1);
 		final FileInfoHolder holder = new FileInfoHolder();
 
 		File file = new File("src/test/resources/mini_r8_car.png");
-		fc.readFileInfo(file, new FileInfoListener() {
-			@Override
-			public void fileInfoReady(FileInfo fileInfo) {
-				holder.fileInfo = fileInfo;
-				latch.countDown();
-			}
-		});
-
-		if (!latch.await(10, TimeUnit.SECONDS)) {
-			fail("file info never ready");
-		}
+		holder.fileInfo = fc.readFileInfo(file).get(10, TimeUnit.SECONDS);
 
 		FileInfo fileInfo = holder.fileInfo;
 		assertNotNull(fileInfo);
@@ -150,22 +132,12 @@ public class TestImageConversion {
 	}
 
 	@Test
-	public void testPngHeight() throws InterruptedException {
+	public void testPngHeight() throws InterruptedException, TimeoutException, ExecutionException {
 		final CountDownLatch latch = new CountDownLatch(1);
 		final FileInfoHolder holder = new FileInfoHolder();
 
 		File file = new File("src/test/resources/mini_r8_car.png");
-		fc.readFileInfo(file, new FileInfoListener() {
-			@Override
-			public void fileInfoReady(FileInfo fileInfo) {
-				holder.fileInfo = fileInfo;
-				latch.countDown();
-			}
-		});
-
-		if (!latch.await(10, TimeUnit.SECONDS)) {
-			fail("file info never ready");
-		}
+		holder.fileInfo = fc.readFileInfo(file).get(10, TimeUnit.SECONDS);
 
 		FileInfo fileInfo = holder.fileInfo;
 		assertNotNull(fileInfo);

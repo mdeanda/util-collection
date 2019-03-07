@@ -74,13 +74,8 @@ public class AudioConvertor implements Runnable {
 
 		if (!failed) {
 			// now lets read file info...
-			FileInfoReader r = new FileInfoReader(this.fileConverter, outputFile, new FileInfoListener() {
-				@Override
-				public void fileInfoReady(FileInfo fi) {
-					fileInfo = (AudioFileInfo) fi;
-				}
-			});
-			r.run();
+			FileInfoReader r = new FileInfoReader(this.fileConverter, outputFile);
+			fileInfo = (AudioFileInfo) r.call();
 
 			if (fileInfo == null) {
 				failed = true;

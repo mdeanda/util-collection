@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,13 +16,12 @@ import com.thedeanda.util.convert.FileConverter;
 import com.thedeanda.util.process.ProcessResult;
 import com.thedeanda.util.process.RunExec;
 
-public class FileInfoReader implements Runnable {
+public class FileInfoReader implements Callable<FileInfo> {
 	private static final Logger log = LoggerFactory
 			.getLogger(FileInfoReader.class);
 
 	private FileConverter fileConverter;
 	private File file;
-	private FileInfoListener listener;
 	private static final int MAX_DURATION = 10000;
 
 	private static final Pattern sizePatternFromFileCmd = Pattern
@@ -29,26 +29,22 @@ public class FileInfoReader implements Runnable {
 	private static final Pattern sizePatternFromIdentifyCmd = Pattern
 			.compile("^.*\\s+(\\d+)x(\\d+)\\+.*$");
 
-	public FileInfoReader(FileConverter fileConverter, File file,
-			FileInfoListener listener) {
+	public FileInfoReader(FileConverter fileConverter, File file) {
 		log.trace("new file info reader");
 		this.fileConverter = fileConverter;
 		this.file = file;
-		this.listener = listener;
 	}
 
 	@Override
-	public void run() {
+	public FileInfo call() {
 		FileInfo fileInfo = null;
 		try {
 			String fileInfoLine = runFileCommand();
 			fileInfo = fileId(fileInfoLine);
 		} catch (IOException e) {
 			log.warn(e.getMessage(), e);
-		} finally {
-			// TODO: if fileInfo is null, create a generic one here
-			listener.fileInfoReady(fileInfo);
 		}
+		return fileInfo;
 	}
 
 	private String runFileCommand() throws IOException {
