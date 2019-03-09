@@ -38,6 +38,10 @@ public class FileConverter {
 		});
 	}
 
+	public FileConverter(ExecutorService executor) {
+		this.executor = executor;
+	}
+
 	public RunExec getRunExec() {
 		RunExec runExec = new RunExec();
 		if (tempDir != null) {
@@ -89,26 +93,8 @@ public class FileConverter {
 		executor.execute(new AudioConvertor(this, file, properties, listener));
 	}
 
-	public void convertResize(ImageFileInfo file, ImageScaleParams params, ConversionListener<ImageFileInfo> listener) {
-		executor.execute(new ImageScaler(this, file, params, listener));
-	}
-
-	public List<ImageFileInfo> convertResizeInProcess(ImageFileInfo file, ImageScaleParams params) {
-		final Pointer<List<ImageFileInfo>> ret = new Pointer<List<ImageFileInfo>>();
-		ImageScaler is = new ImageScaler(this, file, params, new ConversionListener<ImageFileInfo>() {
-
-			@Override
-			public void failed() {
-				ret.value = null;
-			}
-
-			@Override
-			public void complete(List<ImageFileInfo> files) {
-				ret.value = files;
-			}
-		});
-		is.run();
-		return ret.value;
+	public Future<ImageFileInfo> convertResize(ImageFileInfo file, ImageScaleParams params) {
+		return executor.submit(new ImageScaler(this, file, params));
 	}
 
 	public File getTempDir() {

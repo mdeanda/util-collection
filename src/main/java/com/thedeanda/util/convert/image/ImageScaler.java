@@ -14,8 +14,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
-public class ImageScaler implements Runnable {
+public class ImageScaler implements Callable<ImageFileInfo> {
 	private static final Logger log = LoggerFactory
 			.getLogger(ImageScaler.class);
 
@@ -24,27 +25,22 @@ public class ImageScaler implements Runnable {
 	private FileConverter fileConverter;
 	private ImageFileInfo file;
 	private ImageScaleParams params;
-	private ConversionListener listener;
-
-	private ImageFileInfo fileInfo = null;
 
 	public ImageScaler(FileConverter fileConverter, ImageFileInfo file,
-			ImageScaleParams params, ConversionListener listener) {
+			ImageScaleParams params) {
 		this.fileConverter = fileConverter;
 		this.file = file;
 		this.params = params;
-		this.listener = listener;
 	}
 
 	@Override
-	public void run() {
+	public ImageFileInfo call() throws IOException {
 		int height = params.getHeight();
 		int width = params.getWidth();
 		if (height < 0)
 			height = 0;
 		if (width < 0) {
-			listener.failed();
-			return;
+			throw new IllegalArgumentException("width must be greater than 0");
 		}
 
 		File file = this.file.getFile();
@@ -61,7 +57,6 @@ public class ImageScaler implements Runnable {
 				+ this.file.getThumbExtension();
 
 		File outputFile = null;
-		boolean failed = true;
 		try {
 			outputFile = File.createTempFile(TEMP_BASENAME, fname, fileConverter.getTempDir());
 
@@ -80,35 +75,31 @@ public class ImageScaler implements Runnable {
 			ProcessResult pr = runExec.exec(command, directory);
 			if (pr.getResult() != 0 || !outputFile.exists()
 					|| outputFile.length() <= 0) {
-				log.warn("result from file resize: " + pr.getResult());
-				failed = true;
+				log.warn("result from file resize: {}, \nstdout: {}, \nstderr: {}",
+						pr.getResult(), pr.getStdOutput(), pr.getErrOutput());
+				throw new IOException("file resize failed with result code: " + pr.getResult());
 			}
-			failed = false;
 		} catch (IOException e) {
 			log.error(e.getMessage(), e);
-			failed = true;
-		}
 
-		if (!failed) {
-			// now lets read file info...
-			//TODO: verify that we always get an ImageFileInfo instance here
-			FileInfoReader r = new FileInfoReader(this.fileConverter, outputFile);
-			fileInfo = (ImageFileInfo) r.call();
-
-			if (fileInfo == null) {
-				failed = true;
-			}
-		}
-
-		if (failed) {
 			if (outputFile != null && outputFile.exists()) {
 				outputFile.delete();
 			}
-			listener.failed();
-		} else {
-			List<FileInfo> files = new ArrayList<FileInfo>();
-			files.add(fileInfo);
-			listener.complete(files);
+			throw e;
 		}
+
+		// now lets read file info...
+		//TODO: verify that we always get an ImageFileInfo instance here
+		FileInfoReader r = new FileInfoReader(this.fileConverter, outputFile);
+		ImageFileInfo fileInfo = (ImageFileInfo) r.call();
+
+		if (fileInfo == null) {
+			if (outputFile != null && outputFile.exists()) {
+				outputFile.delete();
+			}
+			throw new IOException("unknown outpuf file detected");
+		}
+
+		return fileInfo;
 	}
 }

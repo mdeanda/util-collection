@@ -19,13 +19,13 @@ import static org.junit.Assert.*;
 
 public class TestImageConversion {
 	private FileConverter fc;
-	private List<FileInfo> files;
+	private List<ImageFileInfo> files;
 
 	@Before
 	public void setup() {
 		fc = new FileConverter();
 		fc.setTempDir(new File("tmp"));
-		files = new ArrayList<FileInfo>();
+		files = new ArrayList<>();
 	}
 
 	@After
@@ -53,24 +53,9 @@ public class TestImageConversion {
 		assertEquals(322, fi.getHeight());
 
 		// ok seems ok, lets scale image
-		final CountDownLatch latch2 = new CountDownLatch(1);
 		ImageScaleParams params = new ImageScaleParams(200);
-		fc.convertResize(fi, params, new ConversionListener<ImageFileInfo>() {
-			@Override
-			public void failed() {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void complete(List<ImageFileInfo> files) {
-				TestImageConversion.this.files.addAll(files);
-				latch2.countDown();
-			}
-		});
-		if (!latch2.await(10, TimeUnit.SECONDS)) {
-			fail("conversion failed or took too long");
-		}
+		ImageFileInfo result = fc.convertResize(fi, params).get();
+		files.add(result);
 
 		assertNotNull(files);
 		assertEquals("file count is off", 1, files.size());
@@ -95,24 +80,9 @@ public class TestImageConversion {
 		assertEquals(322, fi.getHeight());
 
 		// ok seems ok, lets scale image
-		final CountDownLatch latch2 = new CountDownLatch(1);
 		ImageScaleParams params = new ImageScaleParams(800);
-		fc.convertResize(fi, params, new ConversionListener<ImageFileInfo>() {
-			@Override
-			public void failed() {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void complete(List<ImageFileInfo> files) {
-				TestImageConversion.this.files.addAll(files);
-				latch2.countDown();
-			}
-		});
-		if (!latch2.await(10, TimeUnit.SECONDS)) {
-			fail("conversion failed or took too long");
-		}
+		ImageFileInfo result = fc.convertResize(fi, params).get();
+		files.add(result);
 
 		//upscaled images come back at same size by default...
 		assertNotNull(files);
@@ -138,24 +108,9 @@ public class TestImageConversion {
 		assertEquals(322, fi.getHeight());
 
 		// ok seems ok, lets scale image
-		final CountDownLatch latch2 = new CountDownLatch(1);
 		ImageScaleParams params = new ImageScaleParams(0, 40);
-		fc.convertResize(fi, params, new ConversionListener<ImageFileInfo>() {
-			@Override
-			public void failed() {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void complete(List<ImageFileInfo> files) {
-				TestImageConversion.this.files.addAll(files);
-				latch2.countDown();
-			}
-		});
-		if (!latch2.await(10, TimeUnit.SECONDS)) {
-			fail("conversion failed or took too long");
-		}
+		ImageFileInfo result = fc.convertResize(fi, params).get();
+		files.add(result);
 
 		assertNotNull(files);
 		assertEquals("file count is off", 1, files.size());
