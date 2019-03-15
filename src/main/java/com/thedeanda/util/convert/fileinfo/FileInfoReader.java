@@ -35,7 +35,6 @@ public class FileInfoReader implements Callable<FileInfo> {
 		this.file = file;
 	}
 
-	@Override
 	public FileInfo call() {
 		FileInfo fileInfo = null;
 		try {
